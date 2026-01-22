@@ -5,7 +5,7 @@
 // const char* ssid = "SHIHAB";
 // const char* password = "12345678";
 
-String GOOGLE_WEB_API = "AKfycbwW6o0oDJ23mDpYFlZ4Yrt9JXa1WJuuXdJNyvqhb1N5Q1S6KJ3LNVvrn_OVfGnCT3PCGw";
+String GOOGLE_WEB_API = "xxx";
 
 
 void configModeCallback (WiFiManager *myWiFiManager) {

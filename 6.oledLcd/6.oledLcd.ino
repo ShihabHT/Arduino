@@ -3,9 +3,6 @@
 #include <Wire.h>
 
 #include <Fonts/FreeSerif9pt7b.h>        // custom font to fix pixelation FreeSerif9pt7b.h- smaller
-#include <Fonts/FreeSans9pt7b.h>         // custom font to fix pixelation FreeSans9pt7b.h
-#include <Fonts/Org_01.h>
-#include <Fonts/Tiny3x3a2pt7b.h>
 
 // Define the OLED display width and height
 #define OLED_WIDTH 128
@@ -29,17 +26,21 @@ void setup() {
 
     // Clear the display buffer
     display.clearDisplay();
-    
+    // coordinate for 3 line text in y-axis (13, 36, 59) for FreeSerif9pt7b
     display.setFont(&FreeSerif9pt7b);        // custom font to fix pixelation
     display.setTextColor(SSD1306_WHITE);    // Draw white text
     display.setTextSize(1);    
     display.setCursor(0, 13);              // Start at top-left corner (x, y)
-    display.println("Unknown location!");
+    display.println("Unknown locat");
+    display.setCursor(0, 36);              // Start at top-left corner (x, y)
+    display.println("Unknown locatio");
+    display.setCursor(0, 59);              // Start at top-left corner (x, y)
+    display.println("Unknown locatig");
     
-    display.setCursor(0, 50);
-    display.setFont(NULL);                 // Sets default font
-    display.println("Unknown location!");
-    // Update the screen with the buffer contents
+    // display.setCursor(0, 50);
+    // display.setFont(NULL);                 // Sets default font
+    // display.println("Unknown location!");
+   
     display.display();
 }
 
