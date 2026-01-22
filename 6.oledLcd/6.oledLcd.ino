@@ -4,6 +4,8 @@
 
 #include <Fonts/FreeSerif9pt7b.h>        // custom font to fix pixelation FreeSerif9pt7b.h- smaller
 #include <Fonts/FreeSans9pt7b.h>         // custom font to fix pixelation FreeSans9pt7b.h
+#include <Fonts/Org_01.h>
+#include <Fonts/Tiny3x3a2pt7b.h>
 
 // Define the OLED display width and height
 #define OLED_WIDTH 128
@@ -32,14 +34,11 @@ void setup() {
     display.setTextColor(SSD1306_WHITE);    // Draw white text
     display.setTextSize(1);    
     display.setCursor(0, 13);              // Start at top-left corner (x, y)
-    display.println("Hello, world!");
+    display.println("Unknown location!");
     
-    display.setCursor(0, 37);              // Start at top-left corner (x, y)
-    display.println("Hello, world!");
-
-    display.setFont(&FreeSans9pt7b);
-    display.setCursor(0, 61);              // Start at top-left corner (x, y)
-    display.println("Hello, world!");
+    display.setCursor(0, 50);
+    display.setFont(NULL);                 // Sets default font
+    display.println("Unknown location!");
     // Update the screen with the buffer contents
     display.display();
 }

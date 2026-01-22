@@ -1,20 +1,20 @@
+#ifndef RFID_READER_H
+#define RFID_READER_H
+
 #include <SoftwareSerial.h>
 
-#define RFID_RX D5 
-#define RFID_TX -1    // dummy (no TX)
-#define LED D4
+#define RFID_RX D6 
+#define RFID_TX D5 
 
 SoftwareSerial rfid(RFID_RX, RFID_TX);
 
-void setup() {
-  pinMode(LED, OUTPUT);
-  Serial.begin(9600);
-  rfid.begin(9600);
-  Serial.println("\nESP8266 RFID Reader with Checksum Verification Ready...");
-}
-
-void loop() {
-  digitalWrite(LED, HIGH);
+/**
+ * To use this header, begin RFID (rfid.begin(9600)) in setup and call the gerRFIDTag()
+ * Checks for RFID data. 
+ * Returns the Decimal ID as an unsigned long if successful, 
+ * or -1 if no tag is read or checksum fails.
+ */
+unsigned long getRFIDTag() {
   // RDM6300 sends 14 bytes: [Start:0x02] [Data:10 chars] [Checksum:2 chars] [End:0x03]
   if (rfid.available() >= 14) {
     if (rfid.read() == 0x02) { // Found Start Byte
@@ -23,34 +23,28 @@ void loop() {
       uint8_t endByte = rfid.read();
 
       if (endByte == 0x03) {
-        verifyAndPrint(buffer);
+        uint8_t calculated_checksum = 0;
+
+        // 1. Convert 10 ASCII chars to 5 hex bytes and XOR them
+        for (int i = 0; i < 10; i += 2) {
+          calculated_checksum ^= hexToByte(buffer[i], buffer[i + 1]);
+        }
+
+        // 2. Convert the 2 received checksum chars to 1 hex byte
+        uint8_t received_checksum = hexToByte(buffer[10], buffer[11]);
+
+        // 3. Compare results
+        if (calculated_checksum == received_checksum) {
+          Serial.print("Tag ID (Valid): ");
+          return convertHexIdToDecId(buffer);
+        } else {
+          return -1; // returned if data checksum error occurs
+        }
       }
     }
   }
-  delay(2000);
-  digitalWrite(LED, LOW);
-  delay(2000);
 }
 
-void verifyAndPrint(char* data) {
-  uint8_t calculated_checksum = 0;
-  
-  // 1. Convert 10 ASCII chars to 5 hex bytes and XOR them
-  for (int i = 0; i < 10; i += 2) {
-    calculated_checksum ^= hexToByte(data[i], data[i+1]);
-  }
-
-  // 2. Convert the 2 received checksum chars to 1 hex byte
-  uint8_t received_checksum = hexToByte(data[10], data[11]);
-
-  // 3. Compare results
-  if (calculated_checksum == received_checksum) {
-    Serial.print("Tag ID (Valid): ");
-    Serial.println(convertHexIdToDecId(data));
-  } else {
-    Serial.println("Checksum Error! Data corrupted.");
-  }
-}
 
 //converts the HEX id to Decimal value
 unsigned long convertHexIdToDecId(const char* data) {
