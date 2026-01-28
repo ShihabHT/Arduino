@@ -3,10 +3,39 @@
 
 #include <SoftwareSerial.h>
 
-#define RFID_RX D6 
-#define RFID_TX D5 
+#define RFID_RX D5 
+#define RFID_TX -1    // dummy (no TX)
 
 SoftwareSerial rfid(RFID_RX, RFID_TX);
+
+// Function to clear out the "ghost" reads in the Serial buffer
+void flushRFIDBuffer() {
+  while (rfid.available() > 0) {
+    rfid.read();
+    delay(2); // Small delay to allow slow serial bytes to arrive
+  }
+}
+// -------------------------------
+
+uint8_t nibble(char c) {
+  if (c >= '0' && c <= '9') return c - '0';
+  if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+  return 0;
+}
+
+// Helper: Converts two ASCII hex chars (e.g. 'A', 'F') to one byte (0xAF)
+uint8_t hexToByte(char high, char low) {
+  return (nibble(high) << 4) | nibble(low);
+}
+
+//converts the HEX id to Decimal value
+unsigned long convertHexIdToDecId(const char* data) {
+  char uidHex[9];
+  memcpy(uidHex, data + 2, 8);
+  uidHex[8] = '\0';
+  Serial.println(uidHex);   // HEX
+  return strtoul(uidHex, NULL, 16);  // DEC
+}
 
 /**
  * To use this header, begin RFID (rfid.begin(9600)) in setup and call the gerRFIDTag()
@@ -43,26 +72,8 @@ unsigned long getRFIDTag() {
       }
     }
   }
+  return 0; // Return 0 if no tag is currently being read
 }
 
 
-//converts the HEX id to Decimal value
-unsigned long convertHexIdToDecId(const char* data) {
-  char uidHex[9];
-  memcpy(uidHex, data + 2, 8);
-  uidHex[8] = '\0';
-  Serial.println(uidHex);   // HEX
-  return strtoul(uidHex, NULL, 16);  // DEC
-}
-
-// Helper: Converts two ASCII hex chars (e.g. 'A', 'F') to one byte (0xAF)
-uint8_t hexToByte(char high, char low) {
-  return (nibble(high) << 4) | nibble(low);
-}
-
-uint8_t nibble(char c) {
-  if (c >= '0' && c <= '9') return c - '0';
-  if (c >= 'A' && c <= 'F') return c - 'A' + 10;
-  return 0;
-}
-
+#endif
